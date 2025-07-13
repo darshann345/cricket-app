@@ -1,72 +1,93 @@
-# Getting Started with Create React App
+# 🏏 Cricket Scoreboard App
 
-This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
+A dynamic and interactive cricket scoring app built with **React.js** that lets you manage live cricket matches, track scores, player stats, and generate live commentary updates. The app supports ongoing and completed match filters, team and player selection, bowler assignment, and score updates — all in real time.
 
-## Available Scripts
+---
 
-In the project directory, you can run:
+## 🚀 Features
 
-### `npm start`
+-  Filter Matches: View **Ongoing Matches** and **Finished Matches**
+-  Team Setup: Add players to **Team A** and **Team B**
+-  Match Start:
+  - Select striker and runner for batting
+  - Choose a bowler for each over
+-  Score Update:
+  - Add runs: `0, 1, 2, 3, 4, 5, 6`
+  - Register dismissals: `Bowled`, `Caught`, `Run Out`
+  - Select fielder involved in a dismissal
+-  Overs Management:
+  - Set number of overs per match
+-  Live Commentary:
+  - Automatically updates with each ball's result
 
-Runs the app in the development mode.\
-Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
+---
 
-The page will reload when you make changes.\
-You may also see any lint errors in the console.
+## Tech Stack
 
-### `npm test`
+-  **React.js** (Front-end)
+-  Styled Components or CSS Modules (Optional for UI)
+-  State Management using React hooks (useState, useReducer, useContext)
+- (Optional) Backend/DB: JSON-server or Firebase for persistent data (not included in this repo)
 
-Launches the test runner in the interactive watch mode.\
-See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
+---
 
-### `npm run build`
+##  Installation & Setup
 
-Builds the app for production to the `build` folder.\
-It correctly bundles React in production mode and optimizes the build for the best performance.
+1. **Clone the Repository**
+   ```bash
+   git clone https://github.com/darshann345/cricket-scoreboard-app.git
+   cd cricket-scoreboard-app
+Install Dependencies
 
-The build is minified and the filenames include the hashes.\
-Your app is ready to be deployed!
+bash
+Copy
+Edit
+npm install
+Start the Development Server
 
-See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
+bash
+Copy
+Edit
+npm start
+Open the App
+Go to http://localhost:3000 in your browser.
 
-### `npm run eject`
+How to Use the App
+Filter Matches
 
-**Note: this is a one-way operation. Once you `eject`, you can't go back!**
+Use the filter tabs to switch between Ongoing and Finished matches.
 
-If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
+Team Setup
 
-Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
+Enter team names and add players for Team A and Team B before starting the match.
 
-You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
+Start Match
 
-## Learn More
+Select a striker and a runner from the batting team.
 
-You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
+Choose a bowler for the current over.
 
-To learn React, check out the [React documentation](https://reactjs.org/).
+Update Score
 
-### Code Splitting
+After each ball, click the score value (0 to 6) to update.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+If a wicket falls, select dismissal type (Bowled, Caught, Run Out) and the fielder involved.
 
-### Analyzing the Bundle Size
+Over and Innings Management
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+The app automatically tracks balls and overs.
 
-### Making a Progressive Web App
+At the end of the over, you’ll be prompted to select a new bowler.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+Live Commentary
 
-### Advanced Configuration
+Each event (run or dismissal) updates the live commentary section in real-time.
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+## Author
 
-### Deployment
+Darshan N
 
-This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+## Contact
 
-### `npm run build` fails to minify
-
-This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
-"# cricket-scoreboard-app" 
-"# cricket-app" 
+If you have any doubts or questions, feel free to reach out:  
+**darshann679596@gmail.com**

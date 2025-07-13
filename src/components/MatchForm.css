@@ -1,0 +1,28 @@
+.match-form label {
+    display: block;
+    margin-top: 0.8rem;
+    font-weight: bold;
+}
+
+.match-form input,
+.match-form select {
+    width: 100%;
+    padding: 0.3rem;
+    margin-top: 0.2rem;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+}
+
+.match-form button {
+    margin-top: 1rem;
+    width: 100%;
+    padding: 0.5rem;
+    background: #28a745;
+    color: white;
+    border: none;
+    border-radius: 4px;
+}
+
+.match-form button:disabled {
+    background: #ccc;
+}

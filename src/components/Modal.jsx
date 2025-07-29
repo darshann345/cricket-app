@@ -1,5 +1,7 @@
 import React from "react";
 import "./Modal.css";
+import "./MatchForm.css"
+
 
 export default function Modal({ isOpen, title, children, onClose }) {
     if (!isOpen) return null;

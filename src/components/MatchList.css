@@ -23,7 +23,7 @@
     font-size: 0.9rem;
 }
 
-.match-list li:hover {
+.match-list li.unselected:hover {
     background-color: #e6f0ff;
 }
 

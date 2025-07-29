@@ -1,30 +1,45 @@
 import React, { useState, useEffect } from "react";
 import Modal from "./Modal";
 import "./MatchDetail.css";
+import "./MatchForm.css";
 
 export default function MatchDetail({ match, updateMatch }) {
+    console.log("MatchDetail component rendered with match:", match);
+    function getTeamKeyByName(match, name) {
+        if (match.teamA.name === name) return "teamA";
+        if (match.teamB.name === name) return "teamB";
+        return null;
+    }
+
+    const battingTeamKey = getTeamKeyByName(match, match.battingTeam);
+    const bowlingTeamKey = getTeamKeyByName(match, match.bowlingTeam);
+    const battingTeam = match[battingTeamKey];
+    const bowlingTeam = match[bowlingTeamKey];
+
     const [runsInput, setRunsInput] = useState("");
     const [wicketType, setWicketType] = useState("");
     const [outPlayer, setOutPlayer] = useState("");
     const [fielder, setFielder] = useState("");
     const [modalOpen, setModalOpen] = useState(false);
     const [bowler, setBowler] = useState(match.currentBowler || "");
-    const [selectedStriker, setSelectedStriker] = useState(
-        match[match.battingTeam]?.striker || ""
-    );
-    const [selectedNonStriker, setSelectedNonStriker] = useState(
-        match[match.battingTeam]?.nonStriker || ""
-    );
+    const [selectedStriker, setSelectedStriker] = useState(battingTeam?.striker || "");
+    const [selectedNonStriker, setSelectedNonStriker] = useState(battingTeam?.nonStriker || "");
     const [commentary, setCommentary] = useState(match.commentary || []);
 
     useEffect(() => {
+        const newBattingTeamKey = getTeamKeyByName(match, match.battingTeam);
+        const newBattingTeam = match[newBattingTeamKey];
         setBowler(match.currentBowler || "");
-        setSelectedStriker(match[match.battingTeam]?.striker || "");
-        setSelectedNonStriker(match[match.battingTeam]?.nonStriker || "");
+        setSelectedStriker(newBattingTeam?.striker || "");
+        setSelectedNonStriker(newBattingTeam?.nonStriker || "");
         setCommentary(match.commentary || []);
     }, [match]);
 
     function updateBowler(player) {
+        if (match.balls !== 0 && !player) {
+            alert("Cannot change bowler after the first ball of the over.");
+            return;
+        }
         setBowler(player);
         const updatedMatch = { ...match, currentBowler: player };
         updateMatch(updatedMatch);
@@ -37,14 +52,14 @@ export default function MatchDetail({ match, updateMatch }) {
         }
 
         const updatedBattingTeam = {
-            ...match[match.battingTeam],
+            ...battingTeam,
             striker: selectedStriker,
             nonStriker: selectedNonStriker,
         };
 
         updateMatch({
             ...match,
-            [match.battingTeam]: updatedBattingTeam,
+            [battingTeamKey]: updatedBattingTeam,
         });
     }
 
@@ -71,9 +86,6 @@ export default function MatchDetail({ match, updateMatch }) {
             return;
         }
 
-        const battingTeam = match[match.battingTeam];
-        const bowlingTeam = match[match.bowlingTeam];
-
         let newScore = battingTeam.score + Number(runsInput || 0);
         let newWickets = battingTeam.wickets;
         let newOvers = match.overs;
@@ -94,13 +106,13 @@ export default function MatchDetail({ match, updateMatch }) {
                 newComment = `${striker} is out (${wicketType})`;
             }
 
+
             if (fielder) {
                 newComment += ` by ${fielder}`;
             }
 
-            // Remove out player from batsmen
             batsmen = batsmen.filter((p) => p !== outPlayer);
-
+            setWicketType("")
             if (nextBatsmanIndex < battingTeam.players.length) {
                 const nextBatsman = battingTeam.players[nextBatsmanIndex];
                 batsmen.push(nextBatsman);
@@ -131,6 +143,46 @@ export default function MatchDetail({ match, updateMatch }) {
 
         let updatedStatus = match.status;
         const maxOvers = match.matchLength || 20;
+        if (match.innings === 2) {
+            const opponentKey = battingTeamKey === "teamA" ? "teamB" : "teamA";
+            const opponentScore = match[opponentKey].score;
+
+            if (newScore > opponentScore) {
+                updatedStatus = "finished";
+                newComment += ` | ${battingTeam.name} won the match!`;
+
+                const updatedCommentary = [...commentary, newComment];
+
+                const updatedBattingTeam = {
+                    ...battingTeam,
+                    score: newScore,
+                    wickets: newWickets,
+                    batsmen,
+                    striker,
+                    nonStriker,
+                    nextBatsmanIndex,
+                };
+
+                const updatedMatch = {
+                    ...match,
+                    overs: newOvers,
+                    balls: newBalls,
+                    status: updatedStatus,
+                    commentary: updatedCommentary,
+                    [battingTeamKey]: updatedBattingTeam,
+                    currentBowler: bowler,
+                };
+
+                updateMatch(updatedMatch);
+
+                setRunsInput("");
+                setWicketType("");
+                setOutPlayer("");
+                setFielder("");
+
+                return;
+            }
+        }
 
         if (newOvers >= maxOvers && newBalls === 0) {
             if (match.innings === 1) {
@@ -160,7 +212,6 @@ export default function MatchDetail({ match, updateMatch }) {
             else if (match.teamB.score > match.teamA.score) winner = match.teamB.name;
             else winner = "Match Drawn";
 
-            updatedStatus = "finished";
             newComment += ` | Winner: ${winner}`;
         }
 
@@ -182,7 +233,7 @@ export default function MatchDetail({ match, updateMatch }) {
             balls: newBalls,
             status: updatedStatus,
             commentary: updatedCommentary,
-            [match.battingTeam]: updatedBattingTeam,
+            [battingTeamKey]: updatedBattingTeam,
             currentBowler: bowler,
         };
 
@@ -195,10 +246,11 @@ export default function MatchDetail({ match, updateMatch }) {
         setFielder("");
     }
 
-    // Helper to start the second innings
     function startSecondInnings() {
         const newBattingTeam = match.bowlingTeam;
         const newBowlingTeam = match.battingTeam;
+
+        const battingKey = getTeamKeyByName(match, newBattingTeam);
 
         const updatedMatch = {
             ...match,
@@ -209,32 +261,58 @@ export default function MatchDetail({ match, updateMatch }) {
             balls: 0,
             status: "ongoing",
             commentary: [...commentary, "Second innings started"],
-            [newBattingTeam]: {
-                ...match[newBattingTeam],
+            [battingKey]: {
+                ...match[battingKey],
                 score: 0,
                 wickets: 0,
-                batsmen: [match[newBattingTeam].players[0], match[newBattingTeam].players[1]],
-                striker: match[newBattingTeam].players[0],
-                nonStriker: match[newBattingTeam].players[1],
+                batsmen: [match[battingKey].players[0], match[battingKey].players[1]],
+                striker: match[battingKey].players[0],
+                nonStriker: match[battingKey].players[1],
                 nextBatsmanIndex: 2,
             },
             currentBowler: "",
         };
 
         updateMatch(updatedMatch);
+
     }
 
-    const battingPlayers = match[match.battingTeam]?.batsmen || [];
-    const bowlingPlayers = match[match.bowlingTeam]?.players || [];
+    function switchInnings() {
+        const newBattingTeam = match.bowlingTeam;
+        const newBowlingTeam = match.battingTeam;
+
+        const battingKey = getTeamKeyByName(match, newBattingTeam);
+        const bowlingKey = getTeamKeyByName(match, newBowlingTeam);
+
+        const updatedMatch = {
+            ...match,
+            battingTeam: newBattingTeam,
+            bowlingTeam: newBowlingTeam,
+            [battingKey]: {
+                ...match[battingKey],
+                striker: match[battingKey].players[0],
+                nonStriker: match[battingKey].players[1],
+            },
+            [bowlingKey]: {
+                ...match[bowlingKey],
+                currentBowler: "",
+            },
+        };
+
+        updateMatch(updatedMatch);
+    }
+
+    const battingPlayers = battingTeam?.batsmen || [];
+    const bowlingPlayers = bowlingTeam?.players || [];
 
     return (
         <div className="match-detail">
             <h2>
-                {match.teamA.name} vs {match.teamB.name} - Overs: {match.overs}.{match.balls} / {match.matchLength}
+                {match.teamA?.name} vs {match.teamB?.name} - Overs: {match.overs}.{match.balls} / {match.matchLength}
             </h2>
 
             <h3>
-                {`${match[match.battingTeam].name} Batting: ${match[match.battingTeam].score}/${match[match.battingTeam].wickets}`}
+                {battingTeam && `${battingTeam.name} Batting: ${battingTeam.score}/${battingTeam.wickets}`}
             </h3>
 
             <h4>Innings: {match.innings}</h4>
@@ -266,7 +344,7 @@ export default function MatchDetail({ match, updateMatch }) {
             <div className="selectors">
                 <div className="selector-group">
                     <label>Bowler:</label>
-                    <select value={bowler} onChange={(e) => updateBowler(e.target.value)}>
+                    <select value={bowler} onChange={(e) => updateBowler(e.target.value)} disabled={match.balls !== 0}>
                         <option value="">Select Bowler</option>
                         {bowlingPlayers.map((player) => (
                             <option key={player} value={player}>
@@ -279,7 +357,8 @@ export default function MatchDetail({ match, updateMatch }) {
 
             <div className="score-update">
                 <label>Runs:</label>
-                <select value={runsInput} onChange={(e) => setRunsInput(e.target.value)}>
+                <select value={runsInput} onChange={(e) => setRunsInput(e.target.value)} disabled={wicketType}
+                >
                     <option value="">Select Runs</option>
                     {[0, 1, 2, 3, 4, 5, 6].map((num) => (
                         <option key={num} value={num}>
@@ -289,7 +368,7 @@ export default function MatchDetail({ match, updateMatch }) {
                 </select>
 
                 <label>Wicket:</label>
-                <select value={wicketType} onChange={(e) => onWicketChange(e.target.value)}>
+                <select value={wicketType} onChange={(e) => onWicketChange(e.target.value)} disabled={runsInput}>
                     <option value="">No</option>
                     <option value="Bowled">Bowled</option>
                     <option value="Caught">Caught</option>
@@ -319,6 +398,10 @@ export default function MatchDetail({ match, updateMatch }) {
                     Update Score
                 </button>
             </div>
+
+            <button onClick={switchInnings} disabled={match.status === "finished" || match.innings === 1 && match.balls > 0 || match.innings === 2} >
+                Switch Innings
+            </button>
 
             <h3>Commentary</h3>
             <div className="commentary-box">

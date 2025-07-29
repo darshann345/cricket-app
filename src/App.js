@@ -8,20 +8,27 @@ export default function App() {
   const [matches, setMatches] = useState([]);
   const [selectedMatchId, setSelectedMatchId] = useState(null);
   const [filter, setFilter] = useState("all");
-  const [isModalOpen, setIsModalOpen] = useState(false); // modal state
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [matchId, setMatchId] = useState(0);
 
-  // open modal instead of prompt
+  // Open modal for new match
   const openNewMatchModal = () => {
     setIsModalOpen(true);
   };
 
-  // Create match from modal data
-  const createMatch = ({ matchLength, teamAPlayers, teamBPlayers }) => {
+  // Create new match
+  const createMatch = ({ matchLength, teamAPlayers, teamBPlayers, teamAName, teamBName }) => {
+    if (teamAPlayers.length < 2 || teamBPlayers.length < 2) {
+      alert("Each team must have at least 2 players.");
+      return;
+    }
+
+    const newId = matchId + 1;
     const newMatch = {
-      id: Date.now(),
+      id: newId,
       matchLength,
       teamA: {
-        name: "Team A",
+        name: teamAName || "Team A",
         players: teamAPlayers,
         score: 0,
         wickets: 0,
@@ -31,7 +38,7 @@ export default function App() {
         nextBatsmanIndex: 2,
       },
       teamB: {
-        name: "Team B",
+        name: teamBName || "Team B",
         players: teamBPlayers,
         score: 0,
         wickets: 0,
@@ -46,22 +53,25 @@ export default function App() {
       innings: 1,
       commentary: [],
       status: "ongoing",
-      battingTeam: "teamA",
-      bowlingTeam: "teamB",
+      battingTeam: teamAName || "teamA",
+      bowlingTeam: teamBName || "teamB",
     };
 
     setMatches([...matches, newMatch]);
     setSelectedMatchId(newMatch.id);
     setIsModalOpen(false);
+    setMatchId(newId);
   };
 
-  // ...rest of your existing code
+  const selectedMatch = matches.find((m) => m.id === selectedMatchId);
 
   return (
     <div className="app-container">
       <header>
         <h1>Cricket Scoreboard</h1>
-        <button onClick={openNewMatchModal}>New Match</button>
+        <button onClick={openNewMatchModal} disabled={isModalOpen}>
+          New Match
+        </button>
         <div className="filter-buttons">
           <button
             className={filter === "all" ? "active" : ""}
@@ -96,9 +106,9 @@ export default function App() {
           onSelect={setSelectedMatchId}
         />
 
-        {selectedMatchId ? (
+        {selectedMatch ? (
           <MatchDetail
-            match={matches.find((m) => m.id === selectedMatchId)}
+            match={selectedMatch}
             updateMatch={(updated) =>
               setMatches(matches.map((m) => (m.id === updated.id ? updated : m)))
             }
@@ -109,6 +119,11 @@ export default function App() {
           </div>
         )}
 
+        {/* <NewMatchModal
+          isOpen={isModalOpen}
+          onClose={() => setIsModalOpen(false)}
+          onCreate={createMatch}
+        /> */}
         <NewMatchModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}

@@ -1,5 +1,6 @@
 import React from "react";
 import "./MatchList.css";
+import "./MatchForm.css"
 
 export default function MatchList({ matches, selectedMatchId, onSelect }) {
     return (
@@ -10,7 +11,7 @@ export default function MatchList({ matches, selectedMatchId, onSelect }) {
                 {matches.map((match) => (
                     <li
                         key={match.id}
-                        className={match.id === selectedMatchId ? "selected" : ""}
+                        className={match.id === selectedMatchId ? "selected" : "unselected"}
                         onClick={() => onSelect(match.id)}
                     >
                         {match.teamA.name} vs {match.teamB.name} - Overs: {match.matchLength}
